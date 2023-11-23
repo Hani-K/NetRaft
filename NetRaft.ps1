@@ -1,4 +1,4 @@
-﻿Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Windows.Forms
 
 $FormObject      = [System.Windows.Forms.Form]
 $LabelObject     = [System.Windows.Forms.Label]
