@@ -212,13 +212,14 @@ $btnAbort.BackColor = 'White'
 $btnAbort.Enabled = $false
 $btnAbort.Visible = $false
 
-
 # Parameters
+$global:abortTraceroute = $false
 
 $script:CheckParam1 = "0"
 $script:CheckParam2 = "0"
 $script:Param1 = "0"
 $script:Param2 = "0"
+$script:Param3 = 0
 
 ###############################################################################
 # Functions:
@@ -284,6 +285,205 @@ function Abort-MyFunction {
     }
 }
 #>
+
+####
+# Route Tracer
+
+function routeTraceForm{
+    # Details
+    $boxHelp.Clear()
+    $boxHelp.BackColor = 'LightGray'
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Arial',12,$boldFont)
+    appendColoredLine $boxHelp Blue "Route Tracer!"
+
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',5)
+    $boxHelp.AppendText("`n")
+
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',10)
+    $boxHelp.SelectionAlignment = 'Left'
+    appendColoredLine $boxHelp Black "This tool allows you to trace the route to a server or a domain. You can select the number of hops and timeout limit."
+    
+    # Status
+    $boxStatus.Text = "Route Tracer is selected - Status: Not Ready!"
+
+    # First Parameter
+    $lblParameter1.Visible = $true
+    $boxParameter1.Visible = $true
+    $boxParameter1.Enabled = $true
+    $boxParameter1.ForeColor = 'Gray'
+    $boxParameter1.Text = "example.com"
+    $boxParameter1.Mask = ''
+
+    # GotFocus event handler
+    $boxParameter1.Add_GotFocus({
+        if ($This.ForeColor -eq 'Gray') {
+            $This.Text = ""
+            $This.ForeColor = 'Black'
+        }
+    })
+
+    $lblParameter1.Text = 'Destination:'
+
+    # Second Parameter
+    $lblParameter2.Visible = $true
+    $boxParameter2.Visible = $true
+    $boxParameter2.Enabled = $true
+    $boxParameter2.ForeColor = 'Gray'
+    $boxParameter2.Text = "3"
+    $boxParameter2.Mask = ''
+
+    # GotFocus event handler
+    $boxParameter2.Add_GotFocus({
+        if ($This.ForeColor -eq 'Gray') {
+            $This.Text = ""
+            $This.ForeColor = 'Black'
+        }
+    })
+
+    $lblParameter2.Text = 'Max. Hops:'
+
+    # Labels
+
+    $lblPreset.Visible = $true
+    $lblPreset.Text = "Max. Timeout:"
+
+    # Buttons
+
+    ## Save Button
+    $btnSave.Enabled = $true
+    $btnSave.Visible = $true
+
+    $btnSave.add_Click({
+        Save-TextBoxContent -RichTextBox $boxStatus
+    })
+
+    <#
+    ## Abort Button
+    $btnAbort.Visible = $true
+
+    $btnAbort.add_Click({
+        $global:abortTraceroute = $true
+    })
+    #>
+
+    ## Button 1
+    $btnPreset1.Visible = $true
+    $btnPreset1.Enabled = $true
+    $btnPreset1.Text = '1 Second'
+    $btnPreset1.add_Click({
+        $script:Param3 = 1000
+    })
+    
+    ## Button 2
+    $btnPreset2.Visible = $true
+    $btnPreset2.Enabled = $true
+    $btnPreset2.Text = '3 Seconds'
+    $btnPreset2.add_Click({
+        $script:Param3 = 3000
+    })
+
+    ## Button 3
+    $btnPreset3.Visible = $true
+    $btnPreset3.Enabled = $true
+    $btnPreset3.Text = '5 Seconds'
+    $btnPreset3.add_Click({
+        $script:Param3 = 5000
+    })
+
+    ## Button 4
+    $btnPreset4.Visible = $true
+    $btnPreset4.Enabled = $true
+    $btnPreset4.Text = '10 Seconds'
+    $btnPreset4.add_Click({
+        $script:Param3 = 10000
+    })
+
+    ## Action Button
+    $btnAction.Visible = $true
+    
+
+    ## Creating an event handler with an m-bit to handle against specific conditions
+    $boxParameter1.add_TextChanged({
+        if ($boxParameter1 -ne '') {
+            $script:CheckParam1 = "1"
+        } else {
+            $script:CheckParam1 = "0"
+            }
+        pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
+     })
+
+    $boxParameter2.add_TextChanged({
+        if ($boxParameter2 -ne '') {
+            $script:CheckParam2 = "1"
+        } else {
+            $script:CheckParam2 = "0"
+            }
+        pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
+    })
+
+    $btnAction.add_Click({
+        $script:Param1 = $boxParameter1.Text 
+        $script:Param2 = [int]$boxParameter2.Text
+        routeTracerfunction -Destination "$script:Param1" -MaxHops $script:Param2 -TimeOut $script:Param3
+    })
+    
+    # Extras
+    $lblInitial.Visible = $false
+    $lblParameters.Visible = $true
+}
+
+function routeTracerfunction {
+    param (
+        [string]$Destination,
+        [int32]$MaxHops = 5,
+        [int32]$TimeOut = 10000
+    )
+
+    $boxStatus.Clear()
+    appendColoredLine $boxStatus Yellow "RouteTracer is selected - Status: Running."
+    $boxStatus.AppendText("`r`n")
+    appendColoredLine $boxStatus White "Preparing..."
+    appendColoredLine $boxStatus White "Destination: $Destination"
+    appendColoredLine $boxStatus White "MaxHops: $MaxHops"
+    appendColoredLine $boxStatus White "TimeOut: $TimeOut"
+    $boxStatus.AppendText("`r`n")
+ 
+
+    $pingCommand = "Test-Connection"
+    $pingArgs = @{
+        "ComputerName" = $Destination
+        "Count" = 1
+        "ErrorAction" = "SilentlyContinue"
+    }
+
+    $tracerouteCommand = "tracert"
+
+    Write-Host "Performing traceroute to $Destination..."
+    appendColoredLine $boxStatus White "Performing traceroute to $Destination..."
+
+    try {
+        $pingResult = & $pingCommand @pingArgs
+        if ($null -eq $pingResult) {
+            throw "Destination host not reachable."
+        }
+
+        $tracerouteResult = & $tracerouteCommand -h $MaxHops -w $TimeOut $Destination
+
+        # Display the traceroute result using Write-Host
+        Write-Host "`nTraceroute result:`n"
+        Write-Host $tracerouteResult
+        appendColoredLine $boxStatus White "`nTraceroute result:`n"
+        appendColoredLine $boxStatus White "$tracerouteResult"
+
+    }
+    catch {
+        Write-Host "Error: $_"
+    }
+
+    
+}
+
+
 ####
 # portScannerForm
 function portScannerForm{
@@ -762,9 +962,8 @@ function GetMenuItemObjects{
         $portScanner {
             portScannerForm
         }
-        '3' {
-            sweep -StartIP 0 -endIP 255 -subnet "172.17.17."
-            break
+        $routeTracer {
+            routeTraceForm
         }
         '4' {
             sweep -StartIP 0 -endIP 255 -subnet "192.168.1."
