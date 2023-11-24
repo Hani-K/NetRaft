@@ -221,6 +221,18 @@ $script:Param1 = "0"
 $script:Param2 = "0"
 $script:Param3 = 0
 
+# Timers
+
+$timer = New-Object Windows.Forms.Timer
+$timer.Interval = 1000  # 1000 milliseconds (1 second)
+$timer.Add_Tick({    
+    # Scroll to the caret
+    $boxStatus.ScrollToCaret()
+})
+$timer.Start()
+
+
+
 ###############################################################################
 # Functions:
 
@@ -287,6 +299,209 @@ function Abort-MyFunction {
     }
 }
 #>
+
+####
+# DNS 
+
+function dnsRecordSnaggerForm{
+    # Details
+    $boxHelp.Clear()
+    $boxHelp.BackColor = 'LightGray'
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Arial',12,$boldFont)
+    appendColoredLine $boxHelp Blue "DNS Record Snagger!"
+
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',5)
+    $boxHelp.AppendText("`n")
+
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',10)
+    $boxHelp.SelectionAlignment = 'Left'
+    appendColoredLine $boxHelp Black "This tool will give you the DNS server addresses for all network devices on the system as well as snag all the DNS records available for a target domain."
+    
+    # Status
+    $boxStatus.Text = "DNS Record Snagger is selected - Status: Not Ready!"
+
+    # First Parameter
+    $lblParameter1.Visible = $true
+    $boxParameter1.Visible = $true
+    $boxParameter1.Enabled = $true
+    $boxParameter1.ForeColor = 'Gray'
+    $boxParameter1.Text = "example.com"
+    $boxParameter1.Mask = ''
+
+    # GotFocus event handler
+    $boxParameter1.Add_GotFocus({
+        if ($This.ForeColor -eq 'Gray') {
+            $This.Text = ""
+            $This.ForeColor = 'Black'
+        }
+    })
+
+    $lblParameter1.Text = 'Destination:'
+
+    # Second Parameter
+    $lblParameter2.Visible = $true
+    $boxParameter2.Visible = $true
+    $boxParameter2.Enabled = $true
+    $boxParameter2.ForeColor = 'Gray'
+    $boxParameter2.Text = "3"
+    $boxParameter2.Mask = ''
+
+    # GotFocus event handler
+    $boxParameter2.Add_GotFocus({
+        if ($This.ForeColor -eq 'Gray') {
+            $This.Text = ""
+            $This.ForeColor = 'Black'
+        }
+    })
+
+    $lblParameter2.Text = 'Max. Hops:'
+
+    # Labels
+
+    $lblPreset.Visible = $true
+    $lblPreset.Text = "Max. Timeout:"
+
+    # Buttons
+
+    ## Save Button
+    $btnSave.Enabled = $true
+    $btnSave.Visible = $true
+
+    $btnSave.add_Click({
+        Save-TextBoxContent -RichTextBox $boxStatus
+    })
+
+    <#
+    ## Abort Button
+    $btnAbort.Visible = $true
+
+    $btnAbort.add_Click({
+        $global:abortTraceroute = $true
+    })
+    #>
+
+    ## Button 1
+    $btnPreset1.Visible = $true
+    $btnPreset1.Enabled = $true
+    $btnPreset1.Text = '1 Second'
+    $btnPreset1.add_Click({
+        $script:Param3 = 1000
+    })
+    
+    ## Button 2
+    $btnPreset2.Visible = $true
+    $btnPreset2.Enabled = $true
+    $btnPreset2.Text = '3 Seconds'
+    $btnPreset2.add_Click({
+        $script:Param3 = 3000
+    })
+
+    ## Button 3
+    $btnPreset3.Visible = $true
+    $btnPreset3.Enabled = $true
+    $btnPreset3.Text = '5 Seconds'
+    $btnPreset3.add_Click({
+        $script:Param3 = 5000
+    })
+
+    ## Button 4
+    $btnPreset4.Visible = $true
+    $btnPreset4.Enabled = $true
+    $btnPreset4.Text = '10 Seconds'
+    $btnPreset4.add_Click({
+        $script:Param3 = 10000
+    })
+
+    ## Action Button
+    $btnAction.Visible = $true
+    
+
+    ## Creating an event handler with an m-bit to handle against specific conditions
+    $boxParameter1.add_TextChanged({
+        if ($boxParameter1 -ne '') {
+            $script:CheckParam1 = "1"
+        } else {
+            $script:CheckParam1 = "0"
+            }
+        pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
+     })
+
+    $boxParameter2.add_TextChanged({
+        if ($boxParameter2 -ne '') {
+            $script:CheckParam2 = "1"
+        } else {
+            $script:CheckParam2 = "0"
+            }
+        pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
+    })
+
+    $btnAction.add_Click({
+        $script:Param1 = $boxParameter1.Text 
+        $script:Param2 = [int]$boxParameter2.Text
+        routeTracerfunction -Destination "$script:Param1" -MaxHops $script:Param2 -TimeOut $script:Param3
+    })
+    
+    # Extras
+    $lblInitial.Visible = $false
+    $lblParameters.Visible = $true
+}
+
+function performDNSLookup {
+    param (
+        [string]$target,
+        [string]$recordType
+    )
+
+    try {
+        $dnsResults = Resolve-DnsName -Name $target -Type $recordType -ErrorAction Stop
+        $output = "DNS Lookup Results for $target ($recordType):`r`n"
+        $output += $dnsResults | Format-Table -AutoSize | Out-String
+        $output += "`r`n"
+        Write-Output $output
+        Add-Content -Path $outputFilePath -Value $output
+    } catch {
+        Write-Error "Error performing DNS lookup: $_"
+    }
+}
+
+function checkNetworkDNS {
+    try {
+        $networkDNS = Get-DnsClientServerAddress -ErrorAction Stop
+        $output = "DNS server addresses of network devices on this machine:`r`n"
+        $output += $networkDNS | Format-Table -AutoSize | Out-String
+        $output += "`r`n"
+        Write-Output $output
+        Add-Content -Path $outputFilePath -Value $output
+    } catch {
+        Write-Error "Error while checking for Network DNS: $_"
+    }
+}
+
+function dnsRecordSnagger {
+    param (
+    [string]$target = "google.com"
+    )
+
+    # Define supported record types
+    $validRecordTypes = @("A", "AAAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT")
+
+    # Generate output file name
+    #$outputFileName = "$target-$((Get-Date).ToString('DNS-HHmmss')).txt"
+    #$outputFilePath = Join-Path -Path ".\" -ChildPath $outputFileName
+
+    # Print DNS addresses for all available network devices
+    checkNetworkDNS
+
+
+    # Perform DNS lookups for each record type
+    foreach ($recordType in $validRecordTypes) {
+        performDNSLookup -target $target -recordType $recordType
+    }
+
+    # Display the path to the output file
+    Write-Output "DNS lookup results saved to: $outputFilePath"
+}
+
 
 ####
 # Route Tracer
