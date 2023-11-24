@@ -239,7 +239,9 @@ function Save-TextBoxContent {
     if ($saveFileDialog.ShowDialog() -eq 'OK') {
         # Save the content of the RichTextBox to the selected file
         $RichTextBox.SaveFile($saveFileDialog.FileName, [System.Windows.Forms.RichTextBoxStreamType]::PlainText)
-        Write-Host "Content saved to $($saveFileDialog.FileName)"
+        Write-Host "`nContent saved to $($saveFileDialog.FileName)"
+        $boxStatus.AppendText("`n`r")
+        appendColoredLine $boxStatus White "Content saved to $($saveFileDialog.FileName)"
     }
 }
 
@@ -472,7 +474,9 @@ function routeTracerfunction {
         # Display the traceroute result using Write-Host
         Write-Host "`nTraceroute result:`n"
         Write-Host $tracerouteResult
-        appendColoredLine $boxStatus White "`nTraceroute result:`n"
+        $boxStatus.AppendText("`n`r")
+        appendColoredLine $boxStatus Yellow "Traceroute result:"
+        $boxStatus.AppendText("`n`r")
         appendColoredLine $boxStatus White "$tracerouteResult"
 
     }
