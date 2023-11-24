@@ -217,6 +217,8 @@ $btnAbort.Visible = $false
 
 $script:CheckParam1 = "0"
 $script:CheckParam2 = "0"
+$script:Param1 = "0"
+$script:Param2 = "0"
 
 ###############################################################################
 # Functions:
@@ -289,14 +291,14 @@ function portScannerForm{
     $boxHelp.Clear()
     $boxHelp.BackColor = 'LightGray'
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Arial',12,$boldFont)
-    Append-ColoredLine $boxHelp Blue "PortScanner!"
+    appendColoredLine $boxHelp Blue "PortScanner!"
 
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',5)
     $boxHelp.AppendText("`n")
 
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',10)
     $boxHelp.SelectionAlignment = 'Left'
-    Append-ColoredLine $boxHelp Black "This tool can scan for open or closed ports against a specific domain or a host. You can scan multiple ports by separating them with ', '."
+    appendColoredLine $boxHelp Black "This tool can scan for open or closed ports against a specific domain or a host. You can scan multiple ports by separating them with ', '."
     
     # Status
     $boxStatus.Text = "PortScanner is selected - Status: Not Ready!"
@@ -364,7 +366,7 @@ function portScannerForm{
     $btnPreset1.Enabled = $true
     $btnPreset1.Text = 'HTTP/HTTPS'
     $btnPreset1.add_Click({
-        $boxParameter1.Text = '80'
+        $boxParameter1.Text = "80,443"
         $boxParameter2.Text = "localhost"
     })
     
@@ -406,7 +408,7 @@ function portScannerForm{
         } else {
             $script:CheckParam1 = "0"
             }
-        PingAction-EventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
+        pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
      })
 
     $boxParameter2.add_TextChanged({
@@ -415,16 +417,13 @@ function portScannerForm{
         } else {
             $script:CheckParam2 = "0"
             }
-        PingAction-EventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
+        pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
     })
 
     $btnAction.add_Click({
-        $Param1 = $boxParameter1.Text -split ',' | ForEach-Object { [int]$_ }
-        $Param1_ = $($Param1 -join ',')
-        $Param2 = $boxParameter2.Text
-        #Write-Host "Action= $Param1 - $Param1_ - $Param2"
-        #portScannerFunction2 -ports $Param1 -domain $Param2
-        portScannerFunction -ports $Param1 -hostname $Param2 -timeout 1500
+        $script:Param1 = $boxParameter1.Text -split ',' | ForEach-Object { [int]$_ }
+        $script:Param2 = $boxParameter2.Text
+        portScannerFunction -ports $script:Param1 -hostname $script:Param2 -timeout 1500
     })
     
     # Extras
@@ -441,19 +440,19 @@ function portScannerFunction {
     )
 
     $boxStatus.Clear()
-    Append-ColoredLine $boxStatus Yellow "PingScanner is selected - Status: Running."
+    appendColoredLine $boxStatus Yellow "PingScanner is selected - Status: Running."
     $boxStatus.AppendText("`r`n")
-    Append-ColoredLine $boxStatus White "Preparing..."
-    Append-ColoredLine $boxStatus White "Ports: $ports"
-    Append-ColoredLine $boxStatus White "Hostname: $hostname"
-    Append-ColoredLine $boxStatus White "Timeout: $timeout"
+    appendColoredLine $boxStatus White "Preparing..."
+    appendColoredLine $boxStatus White "Ports: $ports"
+    appendColoredLine $boxStatus White "Hostname: $hostname"
+    appendColoredLine $boxStatus White "Timeout: $timeout"
     $boxStatus.AppendText("`r`n")
 
     $opened = @()
     $closed = @()
 
-    Append-ColoredLine $boxStatus Yellow "Scanning Started!"
-    Append-ColoredLine $boxStatus LightGreen "`nOpen Ports"
+    appendColoredLine $boxStatus Yellow "Scanning Started!"
+    appendColoredLine $boxStatus LightGreen "`nOpen Ports"
 
     foreach ($port in $ports){
         $clientTCP = New-Object System.Net.Sockets.TcpClient
@@ -470,7 +469,7 @@ function portScannerFunction {
             Write-Output "close $port of $ports"
             $closed += $port
         } finally {
-            if ($clientTCP -ne $null) {
+            if ($clientTCP -ne "") {
                 $clientTCP.Close()
             }
         }
@@ -493,9 +492,9 @@ function portScannerFunction {
     Write-Host "`n`nOpened Ports:`n$openPorts" -ForegroundColor Green
     Write-Host "`n`nClosed Ports:`n$closePorts" -ForegroundColor Red
 
-    Append-ColoredLine $boxStatus White "$openPorts"
-    Append-ColoredLine $boxStatus Red "`n`nClose Ports"
-    Append-ColoredLine $boxStatus White "$closePorts"
+    appendColoredLine $boxStatus White "$openPorts"
+    appendColoredLine $boxStatus Red "`n`nClose Ports"
+    appendColoredLine $boxStatus White "$closePorts"
 
 }
 
@@ -507,14 +506,14 @@ function pingSweeperForm{
     $boxHelp.Clear()
     $boxHelp.BackColor = 'LightGray'
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Arial',12,$boldFont)
-    Append-ColoredLine $boxHelp Blue "PingSweeper!"
+    appendColoredLine $boxHelp Blue "PingSweeper!"
 
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',5)
     $boxHelp.AppendText("`n")
     
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',10)
     $boxHelp.SelectionAlignment = 'Left'
-    Append-ColoredLine $boxHelp Black "This tool pings a rang of addersses selected. Type the range of IP addresses you would like to ping for. The tool will then determine the reachablity of each address and save the report. You can select one of the preset ranges for quick RFC1918 troubleshooting."
+    appendColoredLine $boxHelp Black "This tool pings a rang of addersses selected. Type the range of IP addresses you would like to ping for. The tool will then determine the reachablity of each address and save the report. You can select one of the preset ranges for quick RFC1918 troubleshooting."
     
     # Status
     $boxStatus.Text = "PingSweeper is selected - Status: Not Ready!"
@@ -558,7 +557,7 @@ function pingSweeperForm{
     #$btnAbort.add_Click({
     #    Abort-MyFunction
     #})
-
+    
     ## Button 1
     $btnPreset1.Text = '10.0.10.0/24'
     $btnPreset1.Visible = $true
@@ -567,8 +566,8 @@ function pingSweeperForm{
         $boxParameter1.Text = "10 .0  .10 .0"
         $boxParameter2.Text = "10 .0  .10 .254"
 
-        $Param1 = $boxParameter1.Text -replace '\s', ''
-        $Param2 = $boxParameter2.Text -replace '\s', ''
+        $script:Param1 = $boxParameter1.Text -replace '\s', ''
+        $script:Param2 = $boxParameter2.Text -replace '\s', ''
     })
     
     ## Button 2
@@ -579,8 +578,8 @@ function pingSweeperForm{
         $boxParameter1.Text = "192.168.0  .0  "
         $boxParameter2.Text = "192.168.0  .254"
 
-        $Param1 = $boxParameter1.Text -replace '\s', ''
-        $Param2 = $boxParameter2.Text -replace '\s', ''
+        $script:Param1 = $boxParameter1.Text -replace '\s', ''
+        $script:Param2 = $boxParameter2.Text -replace '\s', ''
     })
 
     ## Button 3
@@ -591,8 +590,8 @@ function pingSweeperForm{
         $boxParameter1.Text = "192.168.1  .0  "
         $boxParameter2.Text = "192.168.1  .254"
 
-        $Param1 = $boxParameter1.Text -replace '\s', ''
-        $Param2 = $boxParameter2.Text -replace '\s', ''
+        $script:Param1 = $boxParameter1.Text -replace '\s', ''
+        $script:Param2 = $boxParameter2.Text -replace '\s', ''
     })
 
     ## Button 4
@@ -603,8 +602,8 @@ function pingSweeperForm{
         $boxParameter1.Text = "172.16 .16 .0  "
         $boxParameter2.Text = "172.16 .16 .254"
 
-        $Param1 = $boxParameter1.Text -replace '\s', ''
-        $Param2 = $boxParameter2.Text -replace '\s', ''
+        $script:Param1 = $boxParameter1.Text -replace '\s', ''
+        $script:Param2 = $boxParameter2.Text -replace '\s', ''
     })
 
     ## Action Button
@@ -613,32 +612,31 @@ function pingSweeperForm{
 
     ## Creating an event handler with an m-bit to handle against specific conditions
     $boxParameter1.add_TextChanged({
-        $Param1 = $boxParameter1.Text -replace '\s', ""
-        $IP1 = Test-IsIPAddress -ip "$param1"
+        $script:Param1 = $boxParameter1.Text -replace '\s', ""
+        $IP1 = Test-IsIPAddress -ip "$script:Param1"
         if ($IP1) {
             $script:CheckParam1 = "1"
         } else {
             $script:CheckParam1 = "0"
             }
-        PingAction-EventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
+        pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
      })
 
     $boxParameter2.add_TextChanged({
-        $Param2 = $boxParameter2.Text -replace '\s', ""
-        $IP2 = Test-IsIPAddress -ip "$param2"
+        $script:Param2 = $boxParameter2.Text -replace '\s', ""
+        $IP2 = Test-IsIPAddress -ip "$script:Param2"
         if ($IP2) {
             $script:CheckParam2 = "1"
         } else {
             $script:CheckParam2 = "0"
             }
-        PingAction-EventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
+        pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
     })
 
     $btnAction.add_Click({
-        $Param1 = $boxParameter1.Text -replace '\s', ""
-        $Param2 = $boxParameter2.Text -replace '\s', ""
-        #Write-Host "$Param1, $Param2"
-        pingSweeperFunction -StartIP $Param1 -endIP $Param2
+        $script:Param1 = $boxParameter1.Text -replace '\s', ""
+        $script:Param2 = $boxParameter2.Text -replace '\s', ""
+        pingSweeperFunction -StartIP $script:Param1 -endIP $script:Param2
     })
     
     # Extras
@@ -646,7 +644,7 @@ function pingSweeperForm{
     $lblParameters.Visible = $true
 }
 
-function PingAction-EventHandler {
+function pingActionEventHandler {
     param(
         [string]$CheckParam1,
         [string]$CheckParam2
@@ -693,10 +691,10 @@ function pingSweeperFunction{
 
     # Logging
     $boxStatus.Clear()
-    Append-ColoredLine $boxStatus Yellow "PingSweeper is selected - Status: Running."
+    appendColoredLine $boxStatus Yellow "PingSweeper is selected - Status: Running."
     $boxStatus.AppendText("`r`n")
-    Append-ColoredLine $boxStatus White "Preparing..."
-    Append-ColoredLine $boxStatus White "IP Addresses: $StartIP to $endIP"
+    appendColoredLine $boxStatus White "Preparing..."
+    appendColoredLine $boxStatus White "IP Addresses: $StartIP to $endIP"
     $boxStatus.AppendText("`r`n")
 
     $startIPSplit = $StartIP -split '\.'
@@ -716,8 +714,8 @@ function pingSweeperFunction{
         $reachable = @()
         $not_reachable = @()
 
-        Append-ColoredLine $boxStatus Yellow "Sweeping Started!"
-        Append-ColoredLine $boxStatus LightGreen "`nReachable Hosts"
+        appendColoredLine $boxStatus Yellow "Sweeping Started!"
+        appendColoredLine $boxStatus LightGreen "`nReachable Hosts"
         # Loop through the range and ping sweep
         for ($i = $startIP_Curated; $i -le $endIP_Curated; $i++) {
             $currentIP = $IP_subnet + $i
@@ -731,12 +729,12 @@ function pingSweeperFunction{
         }
         Write-Host "`n`nReachable Hosts:`n$($reachable -join "`n")" -ForegroundColor Green
         Write-Host "`n`nNone Reachable Hosts:`n$($not_reachable -join "`n")" -ForegroundColor Red
-        Append-ColoredLine $boxStatus White "$($reachable -join '`n')"
-        Append-ColoredLine $boxStatus Red "`n`nNone Reachable Hosts"
-        Append-ColoredLine $boxStatus White "$($not_reachable -join "`n")"
+        appendColoredLine $boxStatus White "$($reachable -join "`n")"
+        appendColoredLine $boxStatus Red "`n`nNone Reachable Hosts"
+        appendColoredLine $boxStatus White "$($not_reachable -join "`n")"
     } else {
         $boxStatus.Clear()
-        Append-ColoredLine $boxStatus Red "The Start IP cannot be higher than the End IP."
+        appendColoredLine $boxStatus Red "The Start IP cannot be higher than the End IP."
         Write-Host "The Start IP cannot be higher than the End IP."
     }
    
@@ -799,7 +797,7 @@ $ddlMenu.Add_SelectionChangeCommitted({
 
 })
 
-function Append-ColoredLine {
+function appendColoredLine {
     param( 
         [Parameter(Mandatory = $true, Position = 0)]
         [System.Windows.Forms.RichTextBox]$box,
@@ -820,12 +818,12 @@ function welcome {
     $boxHelp.BackColor = 'Black'
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',16)
     $boxHelp.SelectionAlignment = 'Center'
-    Append-ColoredLine $boxHelp LightGreen "Welcome To NetRaft!"
+    appendColoredLine $boxHelp LightGreen "Welcome To NetRaft!"
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',12)
-    Append-ColoredLine $boxHelp LightGreen "The muli-functional network troubleshooter!"
+    appendColoredLine $boxHelp LightGreen "The muli-functional network troubleshooter!"
     #$boxHelp.AppendText("`r`n")
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',12)
-    Append-ColoredLine $boxHelp Red "Select a tool and begin trouble-shooting! ;)"
+    appendColoredLine $boxHelp Red "Select a tool and begin trouble-shooting! ;)"
 
 }
 
