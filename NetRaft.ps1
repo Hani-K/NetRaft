@@ -221,6 +221,18 @@ $script:Param1 = "0"
 $script:Param2 = "0"
 $script:Param3 = 0
 
+# Timers
+
+$timer = New-Object Windows.Forms.Timer
+$timer.Interval = 1000  # 1000 milliseconds (1 second)
+$timer.Add_Tick({    
+    # Scroll to the caret
+    $boxStatus.ScrollToCaret()
+})
+$timer.Start()
+
+
+
 ###############################################################################
 # Functions:
 
