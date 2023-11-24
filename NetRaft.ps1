@@ -48,7 +48,7 @@ $ddlMenu.Text = 'Select...'
 $pingSweeper = "Ping Sweeper - ping a range of addresses"
 $portScanner = "Port Scanner - scan a ports of an address"
 $routeTracer = "Route Tracer - Trace route of an address"
-$dnsRecordSweeper = "DNS Record Sweeper - Checks for all records"
+$dnsRecordSnagger = "DNS Record Sweeper - Checks for all records"
 
 # Details Label
 $lblInitial = New-Object $LabelObject
@@ -1083,6 +1083,10 @@ function pingActionEventHandler {
             $boxStatus.Text = "PingSweeper is selected - Status: Ready."
         } elseif ($menuItem -eq $portScanner){
             $boxStatus.Text = "PortScanner is selected - Status: Ready."
+        } elseif ($menuItem -eq $routeTracer){
+            $boxStatus.Text = "Route Tracer is selected - Status: Ready."
+        } elseif ($menuItem -eq $dnsRecordSnagger){
+            $boxStatus.Text = "DNS Record Snagger is selected - Status: Ready."
         }
 
     } else {
@@ -1098,6 +1102,10 @@ function pingActionEventHandler {
             $boxStatus.Text = "PingSweeper is selected - Status: Not Ready."
         } elseif ($menuItem -eq $portScanner){
             $boxStatus.Text = "PortScanner is selected - Status: Not Ready."
+        } elseif ($menuItem -eq $routeTracer){
+            $boxStatus.Text = "Route Tracer is selected - Status: Not Ready."
+        } elseif ($menuItem -eq $dnsRecordSnagger){
+            $boxStatus.Text = "DNS Record Snagger is selected - Status: Not Ready."
         }
     }
 }
@@ -1162,7 +1170,7 @@ function pingSweeperFunction{
 ###############################################################################
 
 # Loading tools to the dropdown
-$toolsMenu = @($pingSweeper,$portScanner,$routeTracer,$dnsRecordSweeper)
+$toolsMenu = @($pingSweeper,$portScanner,$routeTracer,$dnsRecordSnagger)
 ForEach-Object {
     $ddlMenu.Items.AddRange($toolsMenu)
 }
@@ -1184,16 +1192,14 @@ function GetMenuItemObjects{
         $routeTracer {
             routeTraceForm
         }
-        '4' {
-            sweep -StartIP 0 -endIP 255 -subnet "192.168.1."
-            break
+        $dnsRecordSnagger {
+            dnsRecordSnaggerForm
         }
         '5' {
-            sweep -StartIP 0 -endIP 255 -subnet "192.168.0."
-            break
+            Write-Host "Empty for now!"
         }
         default {
-            Write-Host "Invalid selection. Please enter 1, 2, or 3."
+            Write-Host "Selector!"
         }
     }
 }
