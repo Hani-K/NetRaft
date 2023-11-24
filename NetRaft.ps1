@@ -1,4 +1,5 @@
-Add-Type -AssemblyName System.Windows.Forms
+﻿Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 
 $FormObject      = [System.Windows.Forms.Form]
 $LabelObject     = [System.Windows.Forms.Label]
@@ -8,17 +9,25 @@ $TextBoxObject = [System.Windows.Forms.TextBox]
 $RichTextBoxObject = [Windows.Forms.RichTextBox]
 $MaskedTextBoxObject = [System.Windows.Forms.MaskedTextBox]
 $ButtonObject = [System.Windows.Forms.Button]
+$fontStyler = [System.Drawing.FontStyle]
 
-$DefaultFont = 'Calibri,10'
+$boldFont = $fontStyler::Bold
+$italicFont = $fontStyler::Italic
+$underlineFont = $fontStyler::Underline
+$DefaultFont = New-Object System.Drawing.Font('Arial',10,$boldFont) # Calibri
+$DefauktBtnFont = New-Object Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
 
 # Setup base form
 $AppForm = New-Object $FormObject
-$AppForm.ClientSize = '1175,1500'
+$AppForm.ClientSize = '500,700'
 $AppForm.Text = 'NetRaft - Network Troubleshooter'
 $AppForm.BackColor = '#ffffff'
 $AppForm.Font = $DefaultFont
 $AppForm.FormBorderStyle = "FixedSingle"
 $AppForm.StartPosition = "CenterScreen"
+$AppForm.BackColor = "#666666"
+#$AppForm.AutoScaleMode = [System.Windows.Forms.AutoScaleMode]::Dpi
+#$AppForm.AutoScaleDimensions = New-Object Drawing.SizeF(96, 96)
 
 # Building the form
 
@@ -26,13 +35,13 @@ $AppForm.StartPosition = "CenterScreen"
 $lblMenu = New-Object $LabelObject
 $lblMenu.Text = 'Tools:'
 $lblMenu.AutoSize = $true
-$lblMenu.Location = New-Object System.Drawing.Point(20,28)
+$lblMenu.Location = New-Object System.Drawing.Point(5,28)
 
 # Dropdown
 $ddlMenu = New-Object $ComboBoxObject
-$ddlMenu.Width = '1000'
-$ddlMenu.Font = 'Calibri,20'
-$ddlMenu.Location = New-Object System.Drawing.Point(125,25)
+$ddlMenu.Width = '380'
+$ddlMenu.Font = 'Calibri,11'
+$ddlMenu.Location = New-Object System.Drawing.Point(55,24)
 $ddlMenu.Text = 'Select...'
 
 # Adding tools to the dropdown menu
@@ -45,55 +54,57 @@ $dnsRecordSweeper = "DNS Record Sweeper - Checks for all records"
 $lblInitial = New-Object $LabelObject
 $lblInitial.Text = 'Select a tool please to continue...'
 $lblInitial.AutoSize = $true
-$lblInitial.Location = New-Object System.Drawing.Point(20,280)
+$lblInitial.Location = New-Object System.Drawing.Point(5,180)
 
 # Destails
 $boxHelp = New-Object $RichTextBoxObject
 $boxHelp.Text = 'Dog shit >.<'
 $boxHelp.AutoSize = $true
-$boxHelp.ClientSize = new-Object System.Drawing.Size(1078, 175)
-$boxHelp.Location = New-Object System.Drawing.Point(45,80)
+$boxHelp.ClientSize = new-Object System.Drawing.Size(487, 100)
+$boxHelp.Location = New-Object System.Drawing.Point(5,60)
 $boxHelp.ReadOnly = $true
 $boxHelp.Font = New-Object System.Drawing.Font('Calibri',18)
 $boxHelp.BackColor = '#959595' #'#ACACAC'
 $boxHelp.ForeColor = 'Black' #'#ACACAC'
 $boxHelp.ScrollBars = 'None'
+$boxHelp.BorderStyle = [System.Windows.Forms.BorderStyle]::None
 
 # Status Box
 $boxStatus = New-Object $RichTextBoxObject
 $boxStatus.Text = 'Status...'
 $boxStatus.AutoSize = $true
-$boxStatus.ClientSize = new-Object System.Drawing.Size(1125, 850)
-$boxStatus.Location = New-Object System.Drawing.Point(25,500)
+$boxStatus.ClientSize = new-Object System.Drawing.Size(487, 320)
+$boxStatus.Location = New-Object System.Drawing.Point(5,350)
 $boxStatus.ReadOnly = $true
-$boxStatus.Font = New-Object System.Drawing.Font('Calibri',18)
+$boxStatus.Font = New-Object System.Drawing.Font('Calibri',12)
 $boxStatus.BackColor = 'Black' #'#ACACAC'
 $boxStatus.ForeColor = 'Red' #'#ACACAC'
 $boxStatus.Multiline = $true
+$boxStatus.BorderStyle = [System.Windows.Forms.BorderStyle]::None
 
 # Parameters Label
 $lblParameters = New-Object $LabelObject
 $lblParameters.Text = 'Parameters:'
 $lblParameters.AutoSize = $true
-$lblParameters.Location = New-Object System.Drawing.Point(20,280)
+$lblParameters.Location = New-Object System.Drawing.Point(5,180)
 $lblParameters.Visible = $false
 
 # Lable - Parameter 1:
 $lblParameter1 = New-Object $LabelObject
 $lblParameter1.Text = 'Parameter1'
 $lblParameter1.AutoSize = $true
-$lblParameter1.Location = New-Object System.Drawing.Point(125,320)
-$lblParameter1.Font = 'Sans,8'
+$lblParameter1.Location = New-Object System.Drawing.Point(25,200)
+$lblParameter1.Font = 'sans,9'
 $lblParameter1.ForeColor = 'Black'
 $lblParameter1.Visible = $false
 
 # TextBox - Parameter 1:
 $boxParameter1 = New-Object $MaskedTextBoxObject
 $boxParameter1.Text = 'Input Parameter..'
-$boxParameter1.Width = '175'
+$boxParameter1.Width = '110'
 $boxParameter1.AutoSize = $true
-$boxParameter1.Location = New-Object System.Drawing.Point(250,325)
-$boxParameter1.Font = 'Sans,10'
+$boxParameter1.Location = New-Object System.Drawing.Point(100,202)
+$boxParameter1.Font = 'Calibri,11'
 $boxParameter1.ForeColor = 'Black'
 $boxParameter1.Enabled = $false
 $boxParameter1.Visible = $false
@@ -103,18 +114,18 @@ $boxParameter1.Visible = $false
 $lblParameter2 = New-Object $LabelObject
 $lblParameter2.Text = 'Parameter2'
 $lblParameter2.AutoSize = $true
-$lblParameter2.Location = New-Object System.Drawing.Point(125,390)
-$lblParameter2.Font = 'Sans,8'
+$lblParameter2.Location = New-Object System.Drawing.Point(25,230)
+$lblParameter2.Font = 'Sans,9'
 $lblParameter2.ForeColor = 'Black'
 $lblParameter2.Visible = $false
 
 # TextBox - Parameter 2:
 $boxParameter2 = New-Object $MaskedTextBoxObject
 $boxParameter2.Text = 'Input Parameter..'
-$boxParameter2.Width = '175'
+$boxParameter2.Width = '110'
 $boxParameter2.AutoSize = $true
-$boxParameter2.Location = New-Object System.Drawing.Point(250,395)
-$boxParameter2.Font = 'Sans,10'
+$boxParameter2.Location = New-Object System.Drawing.Point(100,232)
+$boxParameter2.Font = 'Calibri,11'
 $boxParameter2.ForeColor = 'Black'
 $boxParameter2.Enabled = $false
 $boxParameter2.Visible = $false
@@ -123,35 +134,38 @@ $boxParameter2.Visible = $false
 $btnAction = New-Object $ButtonObject
 $btnAction.Text = 'Troubleshoot'
 $btnAction.AutoSize = $true
-$btnAction.Location = New-Object System.Drawing.Point(1000,450)
+$btnAction.Location = New-Object System.Drawing.Point(390,315)
+$btnAction.ClientSize = New-Object System.Drawing.Size(100, 30)
 $btnAction.BackColor = 'Red'
 $btnAction.FlatStyle = 'Flat'
 $btnAction.Enabled = $false
 $btnAction.Visible = $false
+$btnAction.Font = $DefauktBtnFont
 
 # Preset Label
 $lblPreset = New-Object $LabelObject
 $lblPreset.Text = 'Presets:'
 $lblPreset.AutoSize = $true
-$lblPreset.Location = New-Object System.Drawing.Point(520,280)
+$lblPreset.Location = New-Object System.Drawing.Point(240,180)
 $lblPreset.Visible = $false
 
 # Preset Button1
 $btnPreset1 = New-Object $ButtonObject
 $btnPreset1.Text = 'Preset 1'
 $btnPreset1.AutoSize = $true
-$btnPreset1.ClientSize = new-Object System.Drawing.Size(170, 40)
-$btnPreset1.Location = New-Object System.Drawing.Point(780,395)
+$btnPreset1.ClientSize = new-Object System.Drawing.Size(110, 30)
+$btnPreset1.Location = New-Object System.Drawing.Point(270,202)
 $btnPreset1.FlatStyle = 'Flat'
 $btnPreset1.Enabled = $false
 $btnPreset1.Visible = $false
+$btnPreset1.Font = $DefauktBtnFont
 
 # Preset Button2
 $btnPreset2 = New-Object $ButtonObject
 $btnPreset2.Text = 'Preset 2'
 $btnPreset2.AutoSize = $true
-$btnPreset2.ClientSize = new-Object System.Drawing.Size(170, 40)
-$btnPreset2.Location = New-Object System.Drawing.Point(780,325)
+$btnPreset2.ClientSize = new-Object System.Drawing.Size(110, 30)
+$btnPreset2.Location = New-Object System.Drawing.Point(270,235)
 $btnPreset2.FlatStyle = 'Flat'
 $btnPreset2.Enabled = $false
 $btnPreset2.Visible = $false
@@ -160,8 +174,8 @@ $btnPreset2.Visible = $false
 $btnPreset3 = New-Object $ButtonObject
 $btnPreset3.Text = 'Preset 3'
 $btnPreset3.AutoSize = $true
-$btnPreset3.ClientSize = new-Object System.Drawing.Size(170, 40)
-$btnPreset3.Location = New-Object System.Drawing.Point(600,325)
+$btnPreset3.ClientSize = new-Object System.Drawing.Size(110, 30)
+$btnPreset3.Location = New-Object System.Drawing.Point(385,202)
 $btnPreset3.FlatStyle = 'Flat'
 $btnPreset3.Enabled = $false
 $btnPreset3.Visible = $false
@@ -170,8 +184,8 @@ $btnPreset3.Visible = $false
 $btnPreset4 = New-Object $ButtonObject
 $btnPreset4.Text = 'Preset 4'
 $btnPreset4.AutoSize = $true
-$btnPreset4.ClientSize = new-Object System.Drawing.Size(170, 40)
-$btnPreset4.Location = New-Object System.Drawing.Point(600,395)
+$btnPreset4.ClientSize = new-Object System.Drawing.Size(110, 30)
+$btnPreset4.Location = New-Object System.Drawing.Point(385,235)
 $btnPreset4.FlatStyle = 'Flat'
 $btnPreset4.Enabled = $false
 $btnPreset4.Visible = $false
@@ -180,8 +194,8 @@ $btnPreset4.Visible = $false
 $btnSave = New-Object $ButtonObject
 $btnSave.Text = 'Save'
 $btnSave.AutoSize = $true
-$btnSave.ClientSize = new-Object System.Drawing.Size(150, 40)
-$btnSave.Location = New-Object System.Drawing.Point(1000,395)
+$btnSave.ClientSize = new-Object System.Drawing.Size(100, 30)
+$btnSave.Location = New-Object System.Drawing.Point(285,315)
 $btnSave.FlatStyle = 'Flat'
 $btnSave.BackColor = 'White'
 $btnSave.Enabled = $false
@@ -191,8 +205,8 @@ $btnSave.Visible = $false
 $btnAbort = New-Object $ButtonObject
 $btnAbort.Text = 'Abort'
 $btnAbort.AutoSize = $true
-$btnAbort.ClientSize = new-Object System.Drawing.Size(150, 40)
-$btnAbort.Location = New-Object System.Drawing.Point(1000,340)
+$btnAbort.ClientSize = New-Object System.Drawing.Size(100, 30)
+$btnAbort.Location = New-Object System.Drawing.Point(50,315)
 $btnAbort.FlatStyle = 'Flat'
 $btnAbort.BackColor = 'White'
 $btnAbort.Enabled = $false
@@ -274,12 +288,15 @@ function portScannerForm{
     # Details
     $boxHelp.Clear()
     $boxHelp.BackColor = 'LightGray'
-    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',12)
-    Append-ColoredLine $boxHelp DarkGreen "PortScanner!"
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Arial',12,$boldFont)
+    Append-ColoredLine $boxHelp Blue "PortScanner!"
+
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',5)
+    $boxHelp.AppendText("`n")
+
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',10)
     $boxHelp.SelectionAlignment = 'Left'
-    Append-ColoredLine $boxHelp Black "This tool can scan for open or closed ports against a specific domain or a host."
-    Append-ColoredLine $boxHelp Black "You can scan multiple ports by separating them with ', '."
+    Append-ColoredLine $boxHelp Black "This tool can scan for open or closed ports against a specific domain or a host. You can scan multiple ports by separating them with ', '."
     
     # Status
     $boxStatus.Text = "PortScanner is selected - Status: Not Ready!"
@@ -489,12 +506,15 @@ function pingSweeperForm{
     # Details
     $boxHelp.Clear()
     $boxHelp.BackColor = 'LightGray'
-    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',12)
-    Append-ColoredLine $boxHelp DarkGreen "PingSweeper!"
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Arial',12,$boldFont)
+    Append-ColoredLine $boxHelp Blue "PingSweeper!"
+
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',5)
+    $boxHelp.AppendText("`n")
+    
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',10)
     $boxHelp.SelectionAlignment = 'Left'
-    Append-ColoredLine $boxHelp Black "This tool pings a rang of addersses selected. Type the range of IP addresses you would like to ping for. The tool will then determine the reachablity of each address and save the report."
-    Append-ColoredLine $boxHelp Black "You can select one of the preset ranges for quick RFC1918 troubleshooting."
+    Append-ColoredLine $boxHelp Black "This tool pings a rang of addersses selected. Type the range of IP addresses you would like to ping for. The tool will then determine the reachablity of each address and save the report. You can select one of the preset ranges for quick RFC1918 troubleshooting."
     
     # Status
     $boxStatus.Text = "PingSweeper is selected - Status: Not Ready!"
@@ -515,7 +535,7 @@ function pingSweeperForm{
     $boxParameter2.Mask = '000\.000\.000\.000'
     $boxParameter2.Enabled = $true
 
-    $lblParameter2.Text = 'Ending IP:'
+    $lblParameter2.Text = ' Ending IP:'
 
 
     # Labels
@@ -801,10 +821,10 @@ function welcome {
     $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',16)
     $boxHelp.SelectionAlignment = 'Center'
     Append-ColoredLine $boxHelp LightGreen "Welcome To NetRaft!"
-    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',10)
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',12)
     Append-ColoredLine $boxHelp LightGreen "The muli-functional network troubleshooter!"
-    $boxHelp.AppendText("`r`n")
-    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',10)
+    #$boxHelp.AppendText("`r`n")
+    $boxHelp.SelectionFont = New-Object System.Drawing.Font('Calibri',12)
     Append-ColoredLine $boxHelp Red "Select a tool and begin trouble-shooting! ;)"
 
 }
