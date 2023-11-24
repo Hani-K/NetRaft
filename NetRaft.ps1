@@ -101,7 +101,7 @@ $lblParameter1.Visible = $false
 # TextBox - Parameter 1:
 $boxParameter1 = New-Object $MaskedTextBoxObject
 $boxParameter1.Text = 'Input Parameter..'
-$boxParameter1.Width = '110'
+$boxParameter1.Width = '130'
 $boxParameter1.AutoSize = $true
 $boxParameter1.Location = New-Object System.Drawing.Point(100,202)
 $boxParameter1.Font = 'Calibri,11'
@@ -122,7 +122,7 @@ $lblParameter2.Visible = $false
 # TextBox - Parameter 2:
 $boxParameter2 = New-Object $MaskedTextBoxObject
 $boxParameter2.Text = 'Input Parameter..'
-$boxParameter2.Width = '110'
+$boxParameter2.Width = '130'
 $boxParameter2.AutoSize = $true
 $boxParameter2.Location = New-Object System.Drawing.Point(100,232)
 $boxParameter2.Font = 'Calibri,11'
@@ -203,10 +203,10 @@ $btnSave.Visible = $false
 
 # Abort Button
 $btnAbort = New-Object $ButtonObject
-$btnAbort.Text = 'Abort'
+$btnAbort.Text = 'ABORT!'
 $btnAbort.AutoSize = $true
-$btnAbort.ClientSize = New-Object System.Drawing.Size(100, 30)
-$btnAbort.Location = New-Object System.Drawing.Point(50,315)
+$btnAbort.ClientSize = New-Object System.Drawing.Size(60, 30)
+$btnAbort.Location = New-Object System.Drawing.Point(5,315)
 $btnAbort.FlatStyle = 'Flat'
 $btnAbort.BackColor = 'White'
 $btnAbort.Enabled = $false
