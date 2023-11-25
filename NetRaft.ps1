@@ -579,6 +579,7 @@ function routeTraceForm{
     $btnPreset1.Enabled = $true
     $btnPreset1.Text = '1 Second'
     $btnPreset1.add_Click({
+        $boxParameter1.TextAlign = 'Left'
         $script:Param3 = 1000
     })
     
