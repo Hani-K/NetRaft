@@ -19,7 +19,8 @@ $DefauktBtnFont = New-Object Drawing.Font("Arial", 10, [System.Drawing.FontStyle
 
 # Download the icon
 $iconUrl = "https://raw.githubusercontent.com/Hani-K/NetRaft/main/assets/raftnet.ico"
-$iconBytes = [System.Net.Http.HttpClient]::new().GetByteArrayAsync($iconUrl).Result
+$webClient = New-Object System.Net.WebClient
+$iconBytes = $webClient.DownloadData($iconUrl)
 $icon = New-Object System.Drawing.Icon ([System.IO.MemoryStream]::new($iconBytes))
 
 
