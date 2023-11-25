@@ -17,9 +17,11 @@ $underlineFont = $fontStyler::Underline
 $DefaultFont = New-Object System.Drawing.Font('Arial',10,$boldFont) # Calibri
 $DefauktBtnFont = New-Object Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
 
-# Icon
-$iconPath = "./assets/raftnet.ico"  # Replace this with the actual path to your icon file
-$icon = [System.Drawing.Icon]::ExtractAssociatedIcon($iconPath)
+# Download the icon
+$iconUrl = "https://raw.githubusercontent.com/Hani-K/NetRaft/main/assets/raftnet.ico"
+$iconBytes = [System.Net.Http.HttpClient]::new().GetByteArrayAsync($iconUrl).Result
+$icon = New-Object System.Drawing.Icon ([System.IO.MemoryStream]::new($iconBytes))
+
 
 # Setup base form
 $AppForm = New-Object $FormObject
