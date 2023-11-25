@@ -579,7 +579,15 @@ function routeTraceForm{
     $btnPreset1.Enabled = $true
     $btnPreset1.Text = '1 Second'
     $btnPreset1.add_Click({
-        $boxParameter1.TextAlign = 'Left'
+        if($boxParameter1.Text -ne "") {
+            $textLoop1 = $boxParameter1.Text
+        }
+        $boxParameter1.Text = $textLoop1
+
+        if($boxParameter2.Text -ne "") {
+            $textLoop2 = $boxParameter2.Text
+        }
+        $boxParameter2.Text = $textLoop2
         $script:Param3 = 1000
     })
     
