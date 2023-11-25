@@ -9,6 +9,7 @@ $TextBoxObject = [System.Windows.Forms.TextBox]
 $RichTextBoxObject = [Windows.Forms.RichTextBox]
 $MaskedTextBoxObject = [System.Windows.Forms.MaskedTextBox]
 $ButtonObject = [System.Windows.Forms.Button]
+$LinkLabelObject = [Windows.Forms.LinkLabel]
 $fontStyler = [System.Drawing.FontStyle]
 
 $boldFont = $fontStyler::Bold
@@ -36,6 +37,29 @@ $AppForm.BackColor = "#666666"
 $AppForm.Icon = $icon
 #$AppForm.AutoScaleMode = [System.Windows.Forms.AutoScaleMode]::Dpi
 #$AppForm.AutoScaleDimensions = New-Object Drawing.SizeF(96, 96)
+
+# Links
+$lblGithubLink = New-Object $LinkLabelObject
+$lblGithubLink.Text = "GitHub - Hani K."
+$lblGithubLink.Location = New-Object Drawing.Point(385, 680)
+$lblGithubLink.Size = New-Object Drawing.Size(300, 20)
+$lblGithubLink.Font = New-Object System.Drawing.Font('Lucida Console',8)
+$lblGithubLink.LinkColor = [System.Drawing.Color]::LightGreen
+$lblGithubLink.ActiveLinkColor = [System.Drawing.Color]::Red
+$lblGithubLink.Add_LinkClicked({
+    Start-Process "https://github.com/Hani-K"
+})
+
+$lblVersionLink = New-Object $LinkLabelObject
+$lblVersionLink.Text = "Version 0.5"
+$lblVersionLink.Location = New-Object Drawing.Point(5, 680)
+$lblVersionLink.Size = New-Object Drawing.Size(300, 20)
+$lblVersionLink.Font = New-Object System.Drawing.Font('Lucida Console',8)
+$lblVersionLink.LinkColor = [System.Drawing.Color]::LightGreen
+$lblVersionLink.ActiveLinkColor = [System.Drawing.Color]::Red
+$lblVersionLink.Add_LinkClicked({
+    Start-Process "https://github.com/Hani-K/NetRaft"
+})
 
 # Building the form
 
@@ -1143,7 +1167,7 @@ ForEach-Object {
 }
 
 # Adding the objects to the form
-$AppForm.Controls.AddRange(@($lblMenu,$ddlMenu,$lblInitial,$boxHelp,$boxStatus,$lblParameter1,$boxParameter1,$lblParameter2,$boxParameter2,$lblParameters,$btnAction,$lblPreset,$btnPreset1,$btnPreset2,$btnPreset3,$btnPreset4,$btnSave,$btnAbort))
+$AppForm.Controls.AddRange(@($lblMenu,$ddlMenu,$lblInitial,$boxHelp,$boxStatus,$lblParameter1,$boxParameter1,$lblParameter2,$boxParameter2,$lblParameters,$btnAction,$lblPreset,$btnPreset1,$btnPreset2,$btnPreset3,$btnPreset4,$btnSave,$btnAbort,$lblGithubLink,$lblVersionLink))
 
 ## Menu functionality
 function GetMenuItemObjects{
