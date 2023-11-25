@@ -1036,9 +1036,9 @@ function pingActionEventHandler {
         [string]$CheckParam2
     )
     
-    Write-Host "CheckParams: $CheckParam1, $CheckParam2"
+    #Write-Host "CheckParams: $CheckParam1, $CheckParam2"
     if ($CheckParam1 -eq "1" -and $CheckParam2 -eq "1") {
-        Write-Host "Action is Green!"
+        #Write-Host "Action is Green!"
         $btnAction.BackColor = 'LightGreen'
         $btnAction.Enabled = $true
         $boxStatus.ForeColor = 'LightGreen'
@@ -1057,7 +1057,7 @@ function pingActionEventHandler {
         }
 
     } else {
-        Write-Host "Action is Red!"
+        #Write-Host "Action is Red!"
         $btnAction.BackColor = 'Red'
         $btnAction.Enabled = $false
         $btnAbort.Enabled = $false
