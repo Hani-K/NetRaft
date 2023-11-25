@@ -17,6 +17,10 @@ $underlineFont = $fontStyler::Underline
 $DefaultFont = New-Object System.Drawing.Font('Arial',10,$boldFont) # Calibri
 $DefauktBtnFont = New-Object Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
 
+# Icon
+$iconPath = "./assets/raftnet.ico"  # Replace this with the actual path to your icon file
+$icon = [System.Drawing.Icon]::ExtractAssociatedIcon($iconPath)
+
 # Setup base form
 $AppForm = New-Object $FormObject
 $AppForm.ClientSize = '500,700'
@@ -26,6 +30,7 @@ $AppForm.Font = $DefaultFont
 $AppForm.FormBorderStyle = "FixedSingle"
 $AppForm.StartPosition = "CenterScreen"
 $AppForm.BackColor = "#666666"
+$AppForm.Icon = $icon
 #$AppForm.AutoScaleMode = [System.Windows.Forms.AutoScaleMode]::Dpi
 #$AppForm.AutoScaleDimensions = New-Object Drawing.SizeF(96, 96)
 
@@ -48,7 +53,7 @@ $ddlMenu.Text = 'Select...'
 $pingSweeper = "Ping Sweeper - ping a range of addresses"
 $portScanner = "Port Scanner - scan a ports of an address"
 $routeTracer = "Route Tracer - Trace route of an address"
-$dnsRecordSweeper = "DNS Record Sweeper - Checks for all records"
+$dnsRecordSnagger = "DNS Record Sweeper - Checks for all records"
 
 # Details Label
 $lblInitial = New-Object $LabelObject
@@ -223,6 +228,7 @@ $script:Param3 = 0
 
 # Timers
 
+<#
 $timer = New-Object Windows.Forms.Timer
 $timer.Interval = 1000  # 1000 milliseconds (1 second)
 $timer.Add_Tick({    
@@ -231,13 +237,13 @@ $timer.Add_Tick({
 })
 $timer.Start()
 
-
+#>
 
 ###############################################################################
 # Functions:
 
 # Function to save TextBox content
-function Save-TextBoxContent {
+function saveTextBoxContent {
     param (
         [System.Windows.Forms.RichTextBox]$RichTextBox
     )
@@ -254,6 +260,7 @@ function Save-TextBoxContent {
         Write-Host "`nContent saved to $($saveFileDialog.FileName)"
         $boxStatus.AppendText("`n`r")
         appendColoredLine $boxStatus White "Content saved to $($saveFileDialog.FileName)"
+        $boxStatus.ScrollToCaret()
     }
 }
 
@@ -336,31 +343,16 @@ function dnsRecordSnaggerForm{
         }
     })
 
-    $lblParameter1.Text = 'Destination:'
+    $lblParameter1.Text = 'Target:'
 
     # Second Parameter
-    $lblParameter2.Visible = $true
-    $boxParameter2.Visible = $true
-    $boxParameter2.Enabled = $true
-    $boxParameter2.ForeColor = 'Gray'
-    $boxParameter2.Text = "3"
-    $boxParameter2.Mask = ''
-
-    # GotFocus event handler
-    $boxParameter2.Add_GotFocus({
-        if ($This.ForeColor -eq 'Gray') {
-            $This.Text = ""
-            $This.ForeColor = 'Black'
-        }
-    })
-
-    $lblParameter2.Text = 'Max. Hops:'
+    $boxParameter2.Visible = $false
+    $lblParameter2.Visible = $false
 
     # Labels
 
-    $lblPreset.Visible = $true
-    $lblPreset.Text = "Max. Timeout:"
-
+    $lblPreset.Visible = $false
+    
     # Buttons
 
     ## Save Button
@@ -368,50 +360,22 @@ function dnsRecordSnaggerForm{
     $btnSave.Visible = $true
 
     $btnSave.add_Click({
-        Save-TextBoxContent -RichTextBox $boxStatus
+        saveTextBoxContent -RichTextBox $boxStatus
     })
 
-    <#
-    ## Abort Button
-    $btnAbort.Visible = $true
-
-    $btnAbort.add_Click({
-        $global:abortTraceroute = $true
-    })
-    #>
-
-    ## Button 1
-    $btnPreset1.Visible = $true
-    $btnPreset1.Enabled = $true
-    $btnPreset1.Text = '1 Second'
-    $btnPreset1.add_Click({
-        $script:Param3 = 1000
-    })
     
+    ## Button 1
+    $btnPreset1.Visible = $false
+       
     ## Button 2
-    $btnPreset2.Visible = $true
-    $btnPreset2.Enabled = $true
-    $btnPreset2.Text = '3 Seconds'
-    $btnPreset2.add_Click({
-        $script:Param3 = 3000
-    })
-
+    $btnPreset2.Visible = $false
+    
     ## Button 3
-    $btnPreset3.Visible = $true
-    $btnPreset3.Enabled = $true
-    $btnPreset3.Text = '5 Seconds'
-    $btnPreset3.add_Click({
-        $script:Param3 = 5000
-    })
-
+    $btnPreset3.Visible = $false
+   
     ## Button 4
-    $btnPreset4.Visible = $true
-    $btnPreset4.Enabled = $true
-    $btnPreset4.Text = '10 Seconds'
-    $btnPreset4.add_Click({
-        $script:Param3 = 10000
-    })
-
+    $btnPreset4.Visible = $false
+    
     ## Action Button
     $btnAction.Visible = $true
     
@@ -420,25 +384,17 @@ function dnsRecordSnaggerForm{
     $boxParameter1.add_TextChanged({
         if ($boxParameter1 -ne '') {
             $script:CheckParam1 = "1"
+            $script:CheckParam2 = "1"
         } else {
             $script:CheckParam1 = "0"
+            $script:CheckParam2 = "1"
             }
         pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
      })
 
-    $boxParameter2.add_TextChanged({
-        if ($boxParameter2 -ne '') {
-            $script:CheckParam2 = "1"
-        } else {
-            $script:CheckParam2 = "0"
-            }
-        pingActionEventHandler -CheckParam1 $script:CheckParam1 -CheckParam2 $script:CheckParam2
-    })
-
     $btnAction.add_Click({
-        $script:Param1 = $boxParameter1.Text 
-        $script:Param2 = [int]$boxParameter2.Text
-        routeTracerfunction -Destination "$script:Param1" -MaxHops $script:Param2 -TimeOut $script:Param3
+        $script:Param1 = $boxParameter1.Text
+        dnsRecordSnagger -target "$script:Param1"
     })
     
     # Extras
@@ -458,7 +414,9 @@ function performDNSLookup {
         $output += $dnsResults | Format-Table -AutoSize | Out-String
         $output += "`r`n"
         Write-Output $output
-        Add-Content -Path $outputFilePath -Value $output
+        appendColoredLine $boxStatus White "$output"
+        $boxStatus.ScrollToCaret()
+        #Add-Content -Path $outputFilePath -Value $output
     } catch {
         Write-Error "Error performing DNS lookup: $_"
     }
@@ -471,7 +429,9 @@ function checkNetworkDNS {
         $output += $networkDNS | Format-Table -AutoSize | Out-String
         $output += "`r`n"
         Write-Output $output
-        Add-Content -Path $outputFilePath -Value $output
+        appendColoredLine $boxStatus White "$output"
+        $boxStatus.ScrollToCaret()
+        #Add-Content -Path $outputFilePath -Value $output
     } catch {
         Write-Error "Error while checking for Network DNS: $_"
     }
@@ -482,24 +442,28 @@ function dnsRecordSnagger {
     [string]$target = "google.com"
     )
 
+    $boxStatus.Clear()
+    appendColoredLine $boxStatus Yellow "DNS Record Snagger is selected - Status: Running."
+    $boxStatus.AppendText("`r`n")
+    appendColoredLine $boxStatus White "Preparing..."
+    appendColoredLine $boxStatus White "Target: $target"
+    $boxStatus.AppendText("`r`n")
+
+    
     # Define supported record types
     $validRecordTypes = @("A", "AAAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT")
 
-    # Generate output file name
-    #$outputFileName = "$target-$((Get-Date).ToString('DNS-HHmmss')).txt"
-    #$outputFilePath = Join-Path -Path ".\" -ChildPath $outputFileName
-
     # Print DNS addresses for all available network devices
     checkNetworkDNS
-
 
     # Perform DNS lookups for each record type
     foreach ($recordType in $validRecordTypes) {
         performDNSLookup -target $target -recordType $recordType
     }
 
-    # Display the path to the output file
-    Write-Output "DNS lookup results saved to: $outputFilePath"
+    # Save file of the results
+    saveTextBoxContent
+    
 }
 
 
@@ -571,7 +535,7 @@ function routeTraceForm{
     $btnSave.Visible = $true
 
     $btnSave.add_Click({
-        Save-TextBoxContent -RichTextBox $boxStatus
+        saveTextBoxContent -RichTextBox $boxStatus
     })
 
     <#
@@ -770,7 +734,7 @@ function portScannerForm{
     $btnSave.Visible = $true
 
     $btnSave.add_Click({
-        Save-TextBoxContent -RichTextBox $boxStatus
+        saveTextBoxContent -RichTextBox $boxStatus
     })
 
     ## Abort Button
@@ -967,7 +931,7 @@ function pingSweeperForm{
     $btnSave.Visible = $true
 
     $btnSave.add_Click({
-        Save-TextBoxContent -RichTextBox $boxStatus
+        saveTextBoxContent -RichTextBox $boxStatus
     })
 
     ## Abort Button
@@ -1083,6 +1047,10 @@ function pingActionEventHandler {
             $boxStatus.Text = "PingSweeper is selected - Status: Ready."
         } elseif ($menuItem -eq $portScanner){
             $boxStatus.Text = "PortScanner is selected - Status: Ready."
+        } elseif ($menuItem -eq $routeTracer){
+            $boxStatus.Text = "Route Tracer is selected - Status: Ready."
+        } elseif ($menuItem -eq $dnsRecordSnagger){
+            $boxStatus.Text = "DNS Record Snagger is selected - Status: Ready."
         }
 
     } else {
@@ -1098,6 +1066,10 @@ function pingActionEventHandler {
             $boxStatus.Text = "PingSweeper is selected - Status: Not Ready."
         } elseif ($menuItem -eq $portScanner){
             $boxStatus.Text = "PortScanner is selected - Status: Not Ready."
+        } elseif ($menuItem -eq $routeTracer){
+            $boxStatus.Text = "Route Tracer is selected - Status: Not Ready."
+        } elseif ($menuItem -eq $dnsRecordSnagger){
+            $boxStatus.Text = "DNS Record Snagger is selected - Status: Not Ready."
         }
     }
 }
@@ -1162,7 +1134,7 @@ function pingSweeperFunction{
 ###############################################################################
 
 # Loading tools to the dropdown
-$toolsMenu = @($pingSweeper,$portScanner,$routeTracer,$dnsRecordSweeper)
+$toolsMenu = @($pingSweeper,$portScanner,$routeTracer,$dnsRecordSnagger)
 ForEach-Object {
     $ddlMenu.Items.AddRange($toolsMenu)
 }
@@ -1184,16 +1156,14 @@ function GetMenuItemObjects{
         $routeTracer {
             routeTraceForm
         }
-        '4' {
-            sweep -StartIP 0 -endIP 255 -subnet "192.168.1."
-            break
+        $dnsRecordSnagger {
+            dnsRecordSnaggerForm
         }
         '5' {
-            sweep -StartIP 0 -endIP 255 -subnet "192.168.0."
-            break
+            Write-Host "Empty for now!"
         }
         default {
-            Write-Host "Invalid selection. Please enter 1, 2, or 3."
+            Write-Host "Selector!"
         }
     }
 }
