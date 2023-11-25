@@ -17,6 +17,10 @@ $underlineFont = $fontStyler::Underline
 $DefaultFont = New-Object System.Drawing.Font('Arial',10,$boldFont) # Calibri
 $DefauktBtnFont = New-Object Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
 
+# Icon
+$iconPath = "./assets/raftnet.ico"  # Replace this with the actual path to your icon file
+$icon = [System.Drawing.Icon]::ExtractAssociatedIcon($iconPath)
+
 # Setup base form
 $AppForm = New-Object $FormObject
 $AppForm.ClientSize = '500,700'
@@ -26,6 +30,7 @@ $AppForm.Font = $DefaultFont
 $AppForm.FormBorderStyle = "FixedSingle"
 $AppForm.StartPosition = "CenterScreen"
 $AppForm.BackColor = "#666666"
+$AppForm.Icon = $icon
 #$AppForm.AutoScaleMode = [System.Windows.Forms.AutoScaleMode]::Dpi
 #$AppForm.AutoScaleDimensions = New-Object Drawing.SizeF(96, 96)
 
